@@ -1,20 +1,28 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import "dotenv/config";
 
-let key = process.env.apiKey;
+console.log("firebase config", {
+  apiKey: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_apiKey,
+  authDomain: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_authDomain,
+  projectId: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_projectId,
+  storageBucket: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_storageBucket,
+  messagingSenderId:
+    process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_messagingSenderId,
+  appId: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_appId,
+});
 const firebaseConfig = {
-  apiKey: process.env.apiKey,
-  authDomain: process.env.authDomain,
-  projectId: process.env.projectId,
-  storageBucket: process.env.storageBucket,
-  messagingSenderId: process.env.messagingSenderId,
-  appId: process.env.appId,
+  apiKey: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_apiKey,
+  authDomain: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_authDomain,
+  projectId: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_projectId,
+  storageBucket: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_storageBucket,
+  messagingSenderId:
+    process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_messagingSenderId,
+  appId: process.env.NEXT_PUBLIC_INVENTORY_MANAGEMENT_appId,
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
-console.log(firestore);
+
 export { app, firestore };
