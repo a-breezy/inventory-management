@@ -1,95 +1,101 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import {
+  Autocomplete,
+  Box,
+  Container,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { firestore } from "@/firebase";
+import { collection, query, getDocs, } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import ItemModal from "./components/ItemModal";
+import InventoryButton from "./components/InventoryButton";
+import InventoryTable from "./components/InventoryTable";
 
 export default function Home() {
+  const [inventory, setInventory] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [modalType, setModalType] = useState("Add");
+  const [itemName, setItemName] = useState("");
+  const [itemCount, setItemCount] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
+  const handleOpen = () => setOpen(true);
+
+  const updateInventory = async () => {
+    const inventoryList = [];
+    const snapshot = query(collection(firestore, "inventory"));
+    const docs = await getDocs(snapshot);
+    docs.forEach((doc) => {
+      inventoryList.push({ name: doc.id, ...doc.data() });
+    });
+    setInventory(inventoryList);
+  };
+
+  useEffect(() => {
+    updateInventory();
+  }, []);
+
+  useEffect(() => {
+    setItemName(searchValue);
+    setItemCount();
+  }, [searchValue, itemName, itemCount]);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <Container>
+      <Typography variant="h1" textAlign="center" sx={{ mt: 10 }}>
+        Welcome to Inventory Management
+      </Typography>
+      <Box
+        width="100%"
+        display="flex"
+        justifyContent={"space-around"}
+        flexDirection={"row"}
+        flexWrap={"wrap"}
+      >
+        <InventoryButton
+          buttonFunction={handleOpen}
+          buttonWords={"Add Item"}
+          setModalType={setModalType}
+          modalType={"Add"}
         />
-      </div>
+        <Autocomplete
+          disablePortal
+          id="search-bar"
+          onChange={(event, newSearchValue) => {
+            setSearchValue(newSearchValue);
+            setModalType("Update");
+            setOpen(true);
+          }}
+          options={inventory.map((item) => item.name)}
+          sx={{ width: 300 }}
+          renderInput={(params) => (
+            <TextField {...params} label="search inventory" />
+          )}
+        />
+      </Box>
+      <ItemModal
+        open={open}
+        setOpen={setOpen}
+        updateInventory={updateInventory}
+        modalType={modalType}
+        itemName={itemName}
+        setItemName={setItemName}
+        itemCount={itemCount}
+        setItemCount={setItemCount}
+      />
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      <Box>
+        <InventoryTable
+          inventory={inventory}
+          updateInventory={updateInventory}
+          handleOpen={handleOpen}
+          setModalType={setModalType}
+          setItemName={setItemName}
+          itemName={itemName}
+          setItemCount={setItemCount}
+        />
+      </Box>
+    </Container>
   );
 }
