@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { firestore } from "@/firebase";
-import { collection, query, getDocs, } from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import ItemModal from "./components/ItemModal";
 import InventoryButton from "./components/InventoryButton";
@@ -19,7 +19,6 @@ export default function Home() {
   const [modalType, setModalType] = useState("Add");
   const [itemName, setItemName] = useState("");
   const [itemCount, setItemCount] = useState(1);
-  const [searchValue, setSearchValue] = useState("");
   const handleOpen = () => setOpen(true);
 
   const updateInventory = async () => {
@@ -35,11 +34,6 @@ export default function Home() {
   useEffect(() => {
     updateInventory();
   }, []);
-
-  useEffect(() => {
-    setItemName(searchValue);
-    setItemCount();
-  }, [searchValue, itemName, itemCount]);
 
   return (
     <Container>
@@ -63,9 +57,21 @@ export default function Home() {
           disablePortal
           id="search-bar"
           onChange={(event, newSearchValue) => {
-            setSearchValue(newSearchValue);
-            setModalType("Update");
-            setOpen(true);
+            const selectedItem = inventory.find(
+              (item) => item.name === newSearchValue
+            );
+
+            if (selectedItem) {
+              setItemName(selectedItem.name);
+              setItemCount(selectedItem.count);
+              setModalType("Update");
+              setOpen(true);
+            } else {
+              console.error("Item not found in inventory");
+              setItemName(newSearchValue || "");
+              setOpen(false);
+              setItemCount(1);
+            }
           }}
           options={inventory.map((item) => item.name)}
           sx={{ width: 300 }}

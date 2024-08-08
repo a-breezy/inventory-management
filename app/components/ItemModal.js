@@ -1,8 +1,9 @@
 import { Box, Modal, Stack, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+// import { useState } from "react";
 import { firestore } from "@/firebase";
 import { collection, getDoc, doc, setDoc } from "firebase/firestore";
 import InventoryButton from "./InventoryButton";
+import { useEffect } from "react";
 
 const style = {
   position: "absolute",
@@ -67,7 +68,9 @@ export default function ItemModal({
             variant="outlined"
             fullWidth
             value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
+            onChange={(e) => {
+              setItemName(e.target.value);
+            }}
           />
           <TextField
             id="outline-basic"
